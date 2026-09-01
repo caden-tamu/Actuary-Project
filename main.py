@@ -3,9 +3,9 @@ import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
 import math
-import Interactions
-import glmBuild
-import Plots
+import Interactions as Interactions
+import glmBuild as glmBuild
+import Plots as Plots
 
 #Loading in data from sev and freq csv files
 sev = pd.read_csv("data/freMTPL2sev.csv")
