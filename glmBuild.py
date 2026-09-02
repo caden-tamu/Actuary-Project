@@ -54,3 +54,60 @@ def glmFit2(freq):
     print(model.summary())
     print(model.aic)
 
+
+def glmFit3(freq):
+
+
+    train, test = train_test_split(freq, test_size=0.2, random_state=42)
+    trainOffset = np.log(train['Exposure'])
+    testOffset = np.log(test['Exposure'])
+
+    train["DrivAgeBin"] = pd.qcut(train["DrivAge"], q=5, duplicates='drop')
+    train_bins = pd.qcut(train["DrivAge"], q=5, duplicates='drop', retbins=True)[1]
+    train["DrivAgeBin"] = pd.cut(train["DrivAge"], bins=train_bins, include_lowest=True)
+    test["DrivAgeBin"] = pd.cut(test["DrivAge"], bins=train_bins, include_lowest=True)
+
+    model = smf.glm(formula='ClaimNb ~ BonusMalus + DrivAge + VehAge', data=train, family=sm.families.Poisson(), offset=trainOffset).fit()
+    #print(model.summary())
+    #print(model.aic)
+
+
+    train["VehAgeBin"] = pd.qcut(train["VehAge"], q=5, duplicates='drop')
+    train_bins = pd.qcut(train["VehAge"], q=5, duplicates='drop', retbins=True)[1]
+    train["VehAgeBin"] = pd.cut(train["VehAge"], bins=train_bins, include_lowest=True)
+    test["VehAgeBin"] = pd.cut(test["VehAge"], bins=train_bins, include_lowest=True)
+
+    model = smf.glm(formula='ClaimNb ~ BonusMalus + C(DrivAgeBin) + C(VehAgeBin)', data=train, family=sm.families.Poisson(), offset=trainOffset).fit()
+    print(model.summary())
+    print(model.aic)
+
+
+
+def glmFit4(freq):
+
+    '''
+    In this fit I added the Region categorical variable to the dataset. The AIC and deviance values decreased, 
+    indicating that the model fit improved with the inclusion of this variable. However, many of the variables have
+    high p-values, suggesting that they may not be statistically significant predictors of the response variable. I plan
+    to make broader region tiers to avoid overtfitting and determine if the model fit improves.
+    '''
+
+
+    train, test = train_test_split(freq, test_size=0.2, random_state=42)
+    trainOffset = np.log(train['Exposure'])
+    testOffset = np.log(test['Exposure'])
+
+    train["DrivAgeBin"] = pd.qcut(train["DrivAge"], q=5, duplicates='drop')
+    train_bins = pd.qcut(train["DrivAge"], q=5, duplicates='drop', retbins=True)[1]
+    train["DrivAgeBin"] = pd.cut(train["DrivAge"], bins=train_bins, include_lowest=True)
+    test["DrivAgeBin"] = pd.cut(test["DrivAge"], bins=train_bins, include_lowest=True)
+
+    train["VehAgeBin"] = pd.qcut(train["VehAge"], q=5, duplicates='drop')
+    train_bins = pd.qcut(train["VehAge"], q=5, duplicates='drop', retbins=True)[1]
+    train["VehAgeBin"] = pd.cut(train["VehAge"], bins=train_bins, include_lowest=True)
+    test["VehAgeBin"] = pd.cut(test["VehAge"], bins=train_bins, include_lowest=True)
+
+    #Adding region to the model to see if it improves the AIC and deviance
+    model = smf.glm(formula='ClaimNb ~ BonusMalus + C(DrivAgeBin) + C(VehAgeBin) + C(Region)', data=train, family=sm.families.Poisson(), offset=trainOffset).fit()
+    print(model.summary())
+    print(model.aic)

@@ -32,4 +32,4 @@ freqPivot, exposurePivot = Interactions.heatMap(freq, "DrivAge", "BonusMalus", q
 print(freqPivot)
 print(exposurePivot)
 
-glmBuild.glmFitLinear(freq)
+glmBuild.glmFit4(freq)
