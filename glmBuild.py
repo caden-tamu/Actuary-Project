@@ -57,6 +57,15 @@ def glmFit2(freq):
 
 def glmFit3(freq):
 
+    '''
+    In this new fit, I chose to include the Vehicle Age in the dataset. The AIC and deviance values decreased, indicating that the 
+    model fit improved with the inclusion of this variable. I first tested the model with just a linear dependence for the Vehicle Age,
+    but the AIC and deviance values were higher than the model with DrivAgeBin. I then binned the Vehicle Age variable and was able to reduce the 
+    AIC and Deviance to 230,843.934 and 1.7544e+05 respectively. This suggests that the relationship between Vehicle Age and ClaimNb is also non-linear, 
+    and binning the variable allows for a more flexible model that can capture this relationship.
+    
+    '''
+
 
     train, test = train_test_split(freq, test_size=0.2, random_state=42)
     trainOffset = np.log(train['Exposure'])
