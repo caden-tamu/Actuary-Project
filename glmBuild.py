@@ -110,13 +110,19 @@ def glmFit4(freq):
     train_bins = pd.qcut(train["DrivAge"], q=5, duplicates='drop', retbins=True)[1]
     train["DrivAgeBin"] = pd.cut(train["DrivAge"], bins=train_bins, include_lowest=True)
     test["DrivAgeBin"] = pd.cut(test["DrivAge"], bins=train_bins, include_lowest=True)
+    freq["DrivAgeBin"] = pd.cut(freq["DrivAge"], bins=train_bins, include_lowest=True)  # Add to freq
+
 
     train["VehAgeBin"] = pd.qcut(train["VehAge"], q=5, duplicates='drop')
     train_bins = pd.qcut(train["VehAge"], q=5, duplicates='drop', retbins=True)[1]
     train["VehAgeBin"] = pd.cut(train["VehAge"], bins=train_bins, include_lowest=True)
     test["VehAgeBin"] = pd.cut(test["VehAge"], bins=train_bins, include_lowest=True)
+    freq["VehAgeBin"] = pd.cut(freq["VehAge"], bins=train_bins, include_lowest=True)  # Add to freq
+
 
     #Adding region to the model to see if it improves the AIC and deviance
     model = smf.glm(formula='ClaimNb ~ BonusMalus + C(DrivAgeBin) + C(VehAgeBin) + C(Region)', data=train, family=sm.families.Poisson(), offset=trainOffset).fit()
     print(model.summary())
     print(model.aic)
+
+    return model, freq
