@@ -37,5 +37,7 @@ freqPivot, exposurePivot = Interactions.heatMap(freq, "DrivAge", "BonusMalus", q
 #print(exposurePivot)
 
 model4, freq = glmBuild.glmFit4(freq)
-freq["predicted"] = model4.predict(freq, offset=np.log(freq["Exposure"]))
-liftSummary = V.liftChart(model4, freq, offsetCol="Exposure", claimCol="ClaimNb", q=10, saveName="lift_chart_model4")
+#freq["predicted"] = model4.predict(freq, offset=np.log(freq["Exposure"]))
+#liftSummary = V.liftChart(model4, freq, offsetCol="Exposure", claimCol="ClaimNb", q=10, saveName="lift_chart_model4")
+#giniCoef = V.giniCoefficient(model4, freq, offsetCol="Exposure", claimCol="ClaimNb", saveName="lorenz_curve_model4")
+#print(f"Gini coefficient: {giniCoef:.4f}")
