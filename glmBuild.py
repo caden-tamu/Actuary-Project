@@ -126,3 +126,34 @@ def glmFit4(freq):
     print(model.aic)
 
     return model, freq
+
+
+def glmFit5(freq):
+
+    '''
+
+    '''
+
+
+    train, test = train_test_split(freq, test_size=0.2, random_state=42)
+    trainOffset = np.log(train['Exposure'])
+    testOffset = np.log(test['Exposure'])
+
+    train["DrivAgeBin"] = pd.qcut(train["DrivAge"], q=5, duplicates='drop')
+    train_bins = pd.qcut(train["DrivAge"], q=5, duplicates='drop', retbins=True)[1]
+    train["DrivAgeBin"] = pd.cut(train["DrivAge"], bins=train_bins, include_lowest=True)
+    test["DrivAgeBin"] = pd.cut(test["DrivAge"], bins=train_bins, include_lowest=True)
+    freq["DrivAgeBin"] = pd.cut(freq["DrivAge"], bins=train_bins, include_lowest=True)  # Add to freq
+
+
+    train["VehAgeBin"] = pd.qcut(train["VehAge"], q=5, duplicates='drop')
+    train_bins = pd.qcut(train["VehAge"], q=5, duplicates='drop', retbins=True)[1]
+    train["VehAgeBin"] = pd.cut(train["VehAge"], bins=train_bins, include_lowest=True)
+    test["VehAgeBin"] = pd.cut(test["VehAge"], bins=train_bins, include_lowest=True)
+    freq["VehAgeBin"] = pd.cut(freq["VehAge"], bins=train_bins, include_lowest=True)  # Add to freq
+
+    model = smf.glm(formula='ClaimNb ~ BonusMalus + C(DrivAgeBin) + C(VehAgeBin) + C(Region) + C(VehGas)', data=train, family=sm.families.Poisson(), offset=trainOffset).fit()
+    print(model.summary())
+    print(model.aic)
+
+    return model, freq
