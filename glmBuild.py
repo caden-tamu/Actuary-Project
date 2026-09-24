@@ -131,7 +131,14 @@ def glmFit4(freq):
 def glmFit5(freq):
 
     '''
-
+    In this fit I added the VehGas
+    type variable to the dataset. The AIC and deviance values decreased, 
+    indicating that the model fit improved with the inclusion of this variable.
+    This suggests that the type of vehicle fuel (e.g., gasoline, diesel, electric) 
+    has a significant impact on the claim frequency. However, some categories of VehGas 
+    may have high p-values, which could indicate that they are not statistically
+    significant predictors. Further analysis could involve combining less significant 
+    categories or exploring interactions with other variables.
     '''
 
 
@@ -153,6 +160,59 @@ def glmFit5(freq):
     freq["VehAgeBin"] = pd.cut(freq["VehAge"], bins=train_bins, include_lowest=True)  # Add to freq
 
     model = smf.glm(formula='ClaimNb ~ BonusMalus + C(DrivAgeBin) + C(VehAgeBin) + C(Region) + C(VehGas)', data=train, family=sm.families.Poisson(), offset=trainOffset).fit()
+    print(model.summary())
+    print(model.aic)
+
+    return model, freq
+
+
+def glmFit6(freq):
+
+    '''
+    In this fit I added the VehGas
+    type variable to the dataset. The AIC and deviance values decreased, 
+    indicating that the model fit improved with the inclusion of this variable.
+    This suggests that the type of vehicle fuel (e.g., gasoline, diesel, electric) 
+    has a significant impact on the claim frequency. However, some categories of VehGas 
+    may have high p-values, which could indicate that they are not statistically
+    significant predictors. Further analysis could involve combining less significant 
+    categories or exploring interactions with other variables.
+    '''
+
+
+    train, test = train_test_split(freq, test_size=0.2, random_state=42)
+    trainOffset = np.log(train['Exposure'])
+    testOffset = np.log(test['Exposure'])
+
+    train["DrivAgeBin"] = pd.qcut(train["DrivAge"], q=5, duplicates='drop')
+    train_bins = pd.qcut(train["DrivAge"], q=5, duplicates='drop', retbins=True)[1]
+    train["DrivAgeBin"] = pd.cut(train["DrivAge"], bins=train_bins, include_lowest=True)
+    test["DrivAgeBin"] = pd.cut(test["DrivAge"], bins=train_bins, include_lowest=True)
+    freq["DrivAgeBin"] = pd.cut(freq["DrivAge"], bins=train_bins, include_lowest=True)  # Add to freq
+
+
+    train["VehAgeBin"] = pd.qcut(train["VehAge"], q=5, duplicates='drop')
+    train_bins = pd.qcut(train["VehAge"], q=5, duplicates='drop', retbins=True)[1]
+    train["VehAgeBin"] = pd.cut(train["VehAge"], bins=train_bins, include_lowest=True)
+    test["VehAgeBin"] = pd.cut(test["VehAge"], bins=train_bins, include_lowest=True)
+    freq["VehAgeBin"] = pd.cut(freq["VehAge"], bins=train_bins, include_lowest=True)  # Add to freq
+
+    #Testing linear case first
+    model = smf.glm(formula='ClaimNb ~ BonusMalus + C(DrivAgeBin) + C(VehAgeBin) + C(Region) + C(VehGas) + VehPower', 
+                    data=train, family=sm.families.Poisson(), offset=trainOffset).fit()
+    print(model.summary())
+    print(model.aic)
+
+    #Now testing binned case
+
+    train["VehPowerBin"] = pd.qcut(train["VehPower"], q=5, duplicates='drop')
+    train_bins = pd.qcut(train["VehPower"], q=5, duplicates='drop', retbins=True)[1]
+    train["VehPowerBin"] = pd.cut(train["VehPower"], bins=train_bins, include_lowest=True)
+    test["VehPowerBin"] = pd.cut(test["VehPower"], bins=train_bins, include_lowest=True)
+    freq["VehPowerBin"] = pd.cut(freq["VehPower"], bins=train_bins, include_lowest=True)  # Add to freq
+
+    model = smf.glm(formula='ClaimNb ~ BonusMalus + C(DrivAgeBin) + C(VehAgeBin) + C(Region) + C(VehGas) + C(VehPower)', 
+                data=train, family=sm.families.Poisson(), offset=trainOffset).fit()
     print(model.summary())
     print(model.aic)
 
