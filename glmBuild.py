@@ -203,17 +203,4 @@ def glmFit6(freq):
     print(model.summary())
     print(model.aic)
 
-    #Now testing binned case
-
-    train["VehPowerBin"] = pd.qcut(train["VehPower"], q=5, duplicates='drop')
-    train_bins = pd.qcut(train["VehPower"], q=5, duplicates='drop', retbins=True)[1]
-    train["VehPowerBin"] = pd.cut(train["VehPower"], bins=train_bins, include_lowest=True)
-    test["VehPowerBin"] = pd.cut(test["VehPower"], bins=train_bins, include_lowest=True)
-    freq["VehPowerBin"] = pd.cut(freq["VehPower"], bins=train_bins, include_lowest=True)  # Add to freq
-
-    model = smf.glm(formula='ClaimNb ~ BonusMalus + C(DrivAgeBin) + C(VehAgeBin) + C(Region) + C(VehGas) + C(VehPower)', 
-                data=train, family=sm.families.Poisson(), offset=trainOffset).fit()
-    print(model.summary())
-    print(model.aic)
-
     return model, freq
